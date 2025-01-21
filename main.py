@@ -1,11 +1,7 @@
 import google.generativeai as genai
 
-# Gemini API Key 설정
-<<<<<<< Updated upstream
 GOOGLE_API_KEY = "your-api-key"
-=======
-GOOGLE_API_KEY = "발급받은 Gemini API Key 입력"
->>>>>>> Stashed changes
+
 
 # API 키로 설정 구성
 genai.configure(api_key=GOOGLE_API_KEY)
