@@ -1,10 +1,10 @@
 import google.generativeai as genai
 
-GOOGLE_API_KEY = "your-api-key"
+GEMINI_API_KEY = "your-api-key"
 
 
 # API 키로 설정 구성
-genai.configure(api_key=GOOGLE_API_KEY)
+genai.configure(api_key=GEMINI_API_KEY)
 
 def generate_content_with_gemini(prompt):
     """
