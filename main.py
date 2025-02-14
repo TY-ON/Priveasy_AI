@@ -1,45 +1,37 @@
+from flask import Flask, request, jsonify
 import google.generativeai as genai
+import os
+from dotenv import load_dotenv
 
-GEMINI_API_KEY = "your-api-key"
+GOOGLE_API_KEY = "your-api-key"
 
+app = Flask(__name__)
 
 # API 키로 설정 구성
-genai.configure(api_key=GEMINI_API_KEY)
+genai.configure(api_key=GOOGLE_API_KEY)
 
-def generate_content_with_gemini(prompt):
+def generate_summary(text):
     """
-    Google Gemini API를 사용하여 콘텐츠를 생성하는 함수.
+    Google Gemini API를 사용하여 프롬프트 기반의 AI 응답을 생성하는 함수.
     """
     try:
-        # Generative Model 초기화
         model = genai.GenerativeModel('gemini-pro')
-        
-        # 콘텐츠 생성 요청
-        response = model.generate_content(prompt)
-        
-        # 응답 내용 반환
-        return response.text
-
+        response = model.generate_content(text)
+        return response.text.strip()
     except Exception as e:
-        print(f"Error: {e}")
-        return None
+        return str(e)
 
-if __name__ == "__main__":
-    print("Google Gemini 콘텐츠 생성 서비스")
-    print("종료하려면 'exit'를 입력하세요.")
-    
-    while True:
-        # 사용자 입력 받기
-        prompt = input("\n질문 입력: ").strip()
-        
-        if prompt.lower() == 'exit':
-            print("서비스를 종료합니다.")
-            break
-        
-        # Gemini API로 콘텐츠 생성
-        content = generate_content_with_gemini(prompt)
-        
-        if content:
-            print(f"생성된 콘텐츠: {content}")
-        else:
-            print("콘텐츠 생성에 실패했습니다.")
+@app.route('/summarize', methods=['POST'])
+def summarize():
+    data = request.json
+    privacy_text = data.get("privacyText", "")
+
+    if not privacy_text:
+        return jsonify({"error": "No privacyText provided"}), 400
+
+    # AI 요약 실행
+    summary = generate_summary(privacy_text)
+    return jsonify({"summary": summary})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5001, debug=True)
