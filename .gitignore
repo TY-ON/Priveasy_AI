@@ -1,3 +1,4 @@
 # Ignore Gemini API Key file
 gemini_api_key.txt
 .env
+/priveasy_ai/*

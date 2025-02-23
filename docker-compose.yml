@@ -1,0 +1,8 @@
+services:
+  ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: priveasy_AI
+    ports: 
+      - "5001:5001"
