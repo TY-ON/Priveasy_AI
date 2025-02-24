@@ -2,3 +2,6 @@
 gemini_api_key.txt
 .env
 /priveasy_ai/*
+
+# Vertex AI 설정 파일 (민감 정보 포함)
+vertex_config.py

@@ -1,14 +1,15 @@
 from flask import Flask, request, jsonify
 import vertexai
 from vertexai.generative_models import GenerativeModel, SafetySetting
+import os
 
 app = Flask(__name__)
 
-# Vertex AI 초기화 설정
-PROJECT_ID = "142628820411"
-LOCATION = "us-central1"
-API_ENDPOINT = "us-central1-aiplatform.googleapis.com"
-ENDPOINT_ID = "2769706074251460608"  # Vertex AI 엔드포인트 ID
+PROJECT_ID = os.environ.get("PROJECT_ID")
+LOCATION = os.environ.get("LOCATION")
+API_ENDPOINT = os.environ.get("API_ENDPOINT")
+ENDPOINT_ID = os.environ.get("ENDPOINT_ID")
+
 
 vertexai.init(
     project=PROJECT_ID,
