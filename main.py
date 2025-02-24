@@ -83,9 +83,10 @@ def summarize():
     if not privacy_text:
         return jsonify({"error": "No privacyText provided"}), 400
 
-    # Vertex AI를 통해 요약(또는 지정한 JSON 형식) 생성
     summary = generate_summary(privacy_text)
-    return jsonify({"summary": summary})
+    # GenerationResponse 객체에서 생성된 텍스트를 추출합니다.
+    summary_text = summary.response if hasattr(summary, 'response') else str(summary)
+    return jsonify({"summary": summary_text})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
