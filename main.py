@@ -1,35 +1,88 @@
 from flask import Flask, request, jsonify
-import google.generativeai as genai
-import os
-from dotenv import load_dotenv
-
-GOOGLE_API_KEY = "your-api-key"
+import vertexai
+from vertexai.generative_models import GenerativeModel, SafetySetting
 
 app = Flask(__name__)
 
-# API 키로 설정 구성
-genai.configure(api_key=GOOGLE_API_KEY)
+# Vertex AI 초기화 설정
+PROJECT_ID = "142628820411"
+LOCATION = "us-central1"
+API_ENDPOINT = "us-central1-aiplatform.googleapis.com"
+ENDPOINT_ID = "2769706074251460608"  # Vertex AI 엔드포인트 ID
 
-def generate_summary(text):
+vertexai.init(
+    project=PROJECT_ID,
+    location=LOCATION,
+    api_endpoint=API_ENDPOINT
+)
+
+# 기본 프롬프트 및 생성 설정
+DEFAULT_PROMPT = (
+    "개인정보처리방침을 6가지 항목이 있는 json 형식으로 내보낼거야. 항목은 다음과 같다 : "
+    "개인정보 처리 목적, 개인정보 수집 항목, 개인정보 보유 기간, 개인정보의 제3자 제공(제공 대상, 제공 목적, 제공 항목), "
+    "개인정보 처리위탁(수탁업체, 업무), 개인정보 파기"
+)
+
+GENERATION_CONFIG = {
+    "max_output_tokens": 8192,
+    "temperature": 1,
+    "top_p": 0.95,
+    "response_mime_type": "application/json",
+    "response_schema": {
+        "type": "OBJECT",
+        "properties": {
+            "response": {"type": "STRING"}
+        }
+    },
+}
+
+SAFETY_SETTINGS = [
+    SafetySetting(
+        category=SafetySetting.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold=SafetySetting.HarmBlockThreshold.OFF
+    ),
+    SafetySetting(
+        category=SafetySetting.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold=SafetySetting.HarmBlockThreshold.OFF
+    ),
+    SafetySetting(
+        category=SafetySetting.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold=SafetySetting.HarmBlockThreshold.OFF
+    ),
+    SafetySetting(
+        category=SafetySetting.HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold=SafetySetting.HarmBlockThreshold.OFF
+    ),
+]
+
+def generate_summary(privacy_text, prompt=DEFAULT_PROMPT):
     """
-    Google Gemini API를 사용하여 프롬프트 기반의 AI 응답을 생성하는 함수.
+    입력된 개인정보 텍스트를 바탕으로 Vertex AI를 이용해 JSON 형식의 응답을 생성합니다.
     """
-    try:
-        model = genai.GenerativeModel('gemini-pro')
-        response = model.generate_content(text)
-        return response.text.strip()
-    except Exception as e:
-        return str(e)
+    # Vertex AI Generative Model 생성 (system_instruction에 프롬프트를 전달)
+    model = GenerativeModel(
+        f"projects/{PROJECT_ID}/locations/{LOCATION}/endpoints/{ENDPOINT_ID}",
+        system_instruction=[prompt]
+    )
+    # 대화 세션 시작
+    chat = model.start_chat()
+    # 메시지를 전송하여 응답 생성
+    response = chat.send_message(
+        [privacy_text],
+        generation_config=GENERATION_CONFIG,
+        safety_settings=SAFETY_SETTINGS
+    )
+    return response
 
 @app.route('/summarize', methods=['POST'])
 def summarize():
-    data = request.json
-    privacy_text = data.get("privacyText", "")
-
+    data = request.get_json()
+    privacy_text = data.get("privacyText")
+    
     if not privacy_text:
         return jsonify({"error": "No privacyText provided"}), 400
 
-    # AI 요약 실행
+    # Vertex AI를 통해 요약(또는 지정한 JSON 형식) 생성
     summary = generate_summary(privacy_text)
     return jsonify({"summary": summary})
 
