@@ -8,8 +8,8 @@ from vertex_config import PROJECT_ID, LOCATION, API_ENDPOINT, ENDPOINT_ID
 
 app = Flask(__name__)
 
-# 서비스 계정 키 경로 설정
-load_dotenv()
+# env에서 받아오기기
+load_dotenv() 
 
 GOOGLE_CREDENTIALS_PATH = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
