@@ -2,14 +2,10 @@ from flask import Flask, request, jsonify
 import vertexai
 from vertexai.generative_models import GenerativeModel, SafetySetting
 import os
-from dotenv import load_dotenv
 from google.oauth2 import service_account
 from vertex_config import PROJECT_ID, LOCATION, API_ENDPOINT, ENDPOINT_ID
 
 app = Flask(__name__)
-
-# env에서 받아오기기
-load_dotenv() 
 
 GOOGLE_CREDENTIALS_PATH = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
@@ -86,15 +82,17 @@ def generate_summary(privacy_text, prompt=DEFAULT_PROMPT):
 def summarize():
     data = request.get_json()
     privacy_text = data.get("privacyText")
+    print(1)
     
     if not privacy_text:
         return jsonify({"error": "No privacyText provided"}), 400
 
     # Vertex AI를 통해 요약(또는 지정한 JSON 형식) 생성
+    print(privacy_text)
     summary = generate_summary(privacy_text)
 
     summary_text = summary.response if hasattr(summary, 'response') else str(summary)
     return jsonify({"summary": summary_text})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5001)

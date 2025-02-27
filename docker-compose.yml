@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: priveasy_AI
+    container_name: priveasy_AI_
     ports: 
       - "5001:5001"
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/credentials/adc.json

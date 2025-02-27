@@ -1,3 +1,3 @@
 # Priveasy_AI
 
-pip install google-generativeai 필수
+pip install -r requirements.txt 필수
