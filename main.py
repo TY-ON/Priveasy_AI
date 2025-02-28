@@ -5,9 +5,11 @@ import os
 from google.oauth2 import service_account
 from vertex_config import PROJECT_ID, LOCATION, API_ENDPOINT, ENDPOINT_ID
 import json
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 
+load_dotenv()
 GOOGLE_CREDENTIALS_PATH = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 credentials = service_account.Credentials.from_service_account_file(GOOGLE_CREDENTIALS_PATH)
@@ -82,7 +84,9 @@ def summarize_endpoint():
     privacy_text = data.get("privacyText")
     
     if not privacy_text:
+        print("no privacytext")
         return jsonify({"error": "No privacyText provided"}), 400
+    
 
     summary = generate_summary(privacy_text)
     
