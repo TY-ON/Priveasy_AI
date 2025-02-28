@@ -5,11 +5,9 @@ import os
 from google.oauth2 import service_account
 from vertex_config import PROJECT_ID, LOCATION, API_ENDPOINT, ENDPOINT_ID
 import json
-from dotenv import load_dotenv
 
 app = Flask(__name__)
 
-load_dotenv()
 GOOGLE_CREDENTIALS_PATH = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 credentials = service_account.Credentials.from_service_account_file(GOOGLE_CREDENTIALS_PATH)
